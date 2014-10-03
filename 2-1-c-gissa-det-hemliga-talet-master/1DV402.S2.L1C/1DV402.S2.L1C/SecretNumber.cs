@@ -22,7 +22,7 @@ namespace _1DV402.S2.L1C
         public bool CanMakeGuess
         {
             get {
-                    if ((Count < MaxNumberOfGuesses) || Guess != _number)
+                if ((Count < MaxNumberOfGuesses) && (Outcome != Outcome.Right))
                     {
                         return true;
                     }
@@ -69,36 +69,47 @@ namespace _1DV402.S2.L1C
         }
         public Outcome MakeGuess(int guess)
         {
-            if (guess < 0 || guess > 100)
+            if (CanMakeGuess)
             {
-                throw new ArgumentOutOfRangeException();
-            }
-            else if (guess < _number)
-            {
-                Outcome = Outcome.Low;
-            }
-            else if (guess > _number)
-            {
-                Outcome = Outcome.High;
-            }
-            else if (guess == _number)
-            {
-                Outcome = Outcome.Right;
-            }
-            int counting = 0;
-            do
-            {
-                if (guess == _guessedNumbers[counting].Number)
+                if (guess < 1 || guess > 100)
                 {
-                    Outcome = Outcome.OldGuess;
+                    throw new ArgumentOutOfRangeException();
                 }
-                counting++;
-            } while (counting < Count);
-            if (Outcome != Outcome.OldGuess)
-            {
-                Count++;
+                else if (guess < _number)
+                {
+                    Outcome = Outcome.Low;
+                }
+                else if (guess > _number)
+                {
+                    Outcome = Outcome.High;
+                }
+                else if (guess == _number)
+                {
+                    Outcome = Outcome.Right;
+                }
+                int counting = 0;
+                do
+                {
+                    if (guess == _guessedNumbers[counting].Number)
+                    {
+                        Outcome = Outcome.OldGuess;
+                    }
+                    counting++;
+                } while (counting < Count);
+                _guessedNumbers[Count].Number = guess;
+                _guessedNumbers[Count].Outcome = Outcome;
+                if (Outcome != Outcome.OldGuess)
+                {
+                    Count++;
+                }
+                Guess = guess;
+                return Outcome;
             }
-            return Outcome;
+            else
+            {
+                Outcome = Outcome.NoMoreGuesses;
+                return Outcome;
+            }
         }
         
     }
