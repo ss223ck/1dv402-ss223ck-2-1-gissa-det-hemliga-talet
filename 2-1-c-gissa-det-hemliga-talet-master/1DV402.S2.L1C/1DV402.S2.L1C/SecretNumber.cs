@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace _1DV402.S2.L1C
 {
-    public enum Outcome { Indefinite, Low, High, Right, NoMoreGuesses, OldGuess}
+    public enum Outcome { Indefinite, Low, High, Right, NoMoreGuesses, OldGuess }
     public class SecretNumber
     {
         private Random randomInstance = new Random();
@@ -21,42 +21,34 @@ namespace _1DV402.S2.L1C
         }
         public bool CanMakeGuess
         {
-            get {
-                if ((Count < MaxNumberOfGuesses) && (Outcome != Outcome.Right))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            private set { }
+            get { return Count < MaxNumberOfGuesses && Outcome != Outcome.Right; }
         }
-        public int Count{get; private set;}
-        public int? Guess {get; private set;}
+        public int Count { get; private set; }
+        public int? Guess { get; private set; }
         public GuessedNumber[] GuessedNumbers
         {
             //refererar till en kopia av _guessedNumbers field
-            get {
+            get
+            {
                 GuessedNumber[] copyGuessedArray = new GuessedNumber[_guessedNumbers.Length];
                 Array.Copy(_guessedNumbers, copyGuessedArray, _guessedNumbers.Length);
-                return copyGuessedArray; 
-                }
+                return copyGuessedArray;
+            }
         }
         public int? Number
         {
-            get {
-                    if (CanMakeGuess)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        return _number;
-                    }
+            get
+            {
+                if (CanMakeGuess)
+                {
+                    return null;
                 }
-            set { _number = value; }
+                else
+                {
+                    return _number;
+                }
+            }
+            private set { _number = value; }
         }
         public Outcome Outcome { get; private set; }
         public void Initialize()
@@ -69,13 +61,25 @@ namespace _1DV402.S2.L1C
         }
         public Outcome MakeGuess(int guess)
         {
-            if (CanMakeGuess)
+            if (!CanMakeGuess)
             {
-                if (guess < 1 || guess > 100)
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
-                else if (guess < _number)
+                return Outcome = Outcome.NoMoreGuesses;
+            }
+
+            if (guess < 1 || guess > 100)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            Guess = guess;
+
+            if (_guessedNumbers.Any(n => n.Number == guess))
+            {
+                Outcome = Outcome.OldGuess;
+            }
+            else
+            {
+                if (guess < _number)
                 {
                     Outcome = Outcome.Low;
                 }
@@ -83,34 +87,17 @@ namespace _1DV402.S2.L1C
                 {
                     Outcome = Outcome.High;
                 }
-                else if (guess == _number)
+                else
                 {
                     Outcome = Outcome.Right;
                 }
-                int counting = 0;
-                do
-                {
-                    if (guess == _guessedNumbers[counting].Number)
-                    {
-                        Outcome = Outcome.OldGuess;
-                    }
-                    counting++;
-                } while (counting < Count);
+
                 _guessedNumbers[Count].Number = guess;
                 _guessedNumbers[Count].Outcome = Outcome;
-                if (Outcome != Outcome.OldGuess)
-                {
-                    Count++;
-                }
-                Guess = guess;
-                return Outcome;
+                Count++;
             }
-            else
-            {
-                Outcome = Outcome.NoMoreGuesses;
-                return Outcome;
-            }
+
+            return Outcome;
         }
-        
     }
 }
